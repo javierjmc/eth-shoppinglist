@@ -10,13 +10,23 @@ contract ShoppingList {
 
   Item[] public items;
   uint public nextId = 0;
+  address public owner;
 
-  function addItem(string memory name, uint quantity) public {
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  function addItem(string memory name, uint quantity) public onlyOwner {
     items.push(Item(nextId, quantity, name, false));
     nextId++;
   }
 
-  function toggleItemCheck(uint id) public {
+  function toggleItemCheck(uint id) public onlyOwner {
     Item storage item = items[findItemIndex(id)];
     item.checked = !item.checked;
   }
@@ -30,7 +40,7 @@ contract ShoppingList {
     revert('Item does not exist');
   }
 
-  function clearList() public {
+  function clearList() public onlyOwner {
     delete items;
   }
 
